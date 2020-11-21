@@ -1,0 +1,130 @@
+MIPS32 指令集
+
+通用寄存器： 32个32位寄存器（待定）
+$ra 程序返回地址寄存器
+
+特殊寄存器：
+        PC寄存器
+        无乘法指令
+        //HI寄存器：乘除高位寄存器    （余数）
+        //LO寄存器：乘除低位寄存器    （商）
+
+指令集：
+R类型： 
+---------------------------------
+|op:6|rs:5|rt:5|rd:5|sa:5|func:6|
+---------------------------------
+源寄存器：rs,rt  目的寄存器：rd   
+本次设计中不采用需要5位sa的移位操作，设定op均为0。
+指令名称|op=00000|rs/rt/rd|sa=00000|func:6
+除jr以外所有指令的形式均为： op $1,$2,$3 == op rd rt rs
+add   00001   rd <- rs+rt                               add $1,$2,$3     
+addu  10001   rd <- rs+rt 无符号                         addu $1,$2,$3
+sub   00010   rd <- rt-rs                               sub $1,$2,$3
+subu  10010   rd <- rs-rt 无符号                         subu $1,$2,$3
+and   00011   rd <- rs&rt                               and $1,$2,$3
+or    00100   rd <- rs|rt                               or $1,$2,$3
+xor   00101   rd <- rs^rt                               xor $1,$2,$3
+nor   00110   rd <- ~(rs|rt)                            nor $1,$2,$3
+slt   00111   if(rs<rt) rd <- 1 else rd <- 0            slt $1,$2,$3      
+sllv  01100   rd <- rt<<rs                              sll $1,$2,$3
+srlv  01101   rd <- rt>>rs                              srl $1,$2,$3
+srav  01110   rd <- rt>>rs  (算术右移)                    sra $1,$2,$3
+jr    01011   rs rt=00000 rd==00000   PC <- rs          jr $ra
+nop     全零
+注*：上述指令按顺序编写func，其中func高位为1表示无符号运算。（addu subu） 有符号:无溢出才装入  无符号：不判断溢出
+
+
+I类型：具体操作由op指定，指令的低16位是立即数，运算时要将其扩展至32位，然后作为其中一个源操作数参与运算。
+---------------------------------
+|op:6|rs:5|rt:5|  immediate:16  |
+---------------------------------
+源操作数 rs，imm16->32  op 目的操作数：rt
+addi    00001                   rt <- rs + (sign-extend)immediate                addi $1,$2,100                                  
+addiu   10001                   rt <- rs + (zero-extend)immediate
+andi    00011
+ori     00100
+xori    00101
+lw      01110                   rt <- memory[rs + (sign-extend)immediate]         lw $1,$2(10)
+sw      01111                   memory[rs + (sign-extend)immediate] <- rt         sw $1,$2(10)
+beq     01000                   if (rs == rt) PC <- PC+1 + (sign-extend)immediate
+bne     01001                   if (rs != rt) PC <- PC+1 + (sign-extend)immediate   
+slti    00111                   if (rs <(sign-extend)immediate) rt=1 else rt=0 
+sltiu   10111                   if (rs <(zero-extend)immediate) rt=1 else rt=0
+注*:高位和次高位与为0。 高位为1表示对imm零扩展，否则符号扩展。
+
+统一标准:R类型的func或I类型的op后三位作为ALU的功能选择端，添加一位符号位用来决定无符号运算还是有符号运算因此alu的功能选择如下：
+功能选择      功能
+0001          add
+0010          sub
+0011          and
+0100          or
+0101          xor
+0110          nor
+0111          slt
+1001          addu
+1010          subu
+1100          sllv
+1101          srlv
+1110          srav
+
+J类型:op高位为1
+---------------------------------
+|op:6 |        addr:16
+---------------------------------
+j      100000               PC <- PC+1+addr
+jal    100001               $ra<-PC+1；PC <- PC+1+addr
+
+
+五级流水线：
+IF --> ID --> Ex --> MeM --> Wr
+IF段：
+模块：IM指令寄存器  （存储结构内）
+模块内寄存器：
+        PC寄存器
+        IF/ID寄存器 {
+            next_pc :PC+4
+            instr   :指令:32
+        }
+输入端：{
+    时钟：      clk
+    控制端口 ： JUMPEN       // 1 则 选择跳转的地址， 0 则 选择加4
+    数据端口 ： jump_pc      //跳转pc地址
+}
+输出端：{
+    IF/ID寄存器内容： next_pc  
+                    instr 
+}
+ID端：这里包含了寄存器堆 
+模块1:寄存器堆 读不需要时钟
+输入：{IF/ID 寄存器内容,REGRW,DIN}
+ID/Ex寄存器内容+输出
+ID/Ex寄存器内容：{
+    控制: 
+        EXOP : 扩展器操作  1:符号扩展  0:零扩展
+        ALUSRC: ALU B口来源 1:扩展器  0: busB
+        ALUOP:  ALU辅助控制码 :4
+        REGDST: 目的寄存器选择  1: rd  0: rt
+        RTYPE: 是否为R类型
+        MEMWR: 数据存储器的写信号 1:op=sw 0:else
+        BRANCH: 是否为分支指令 
+        MEM2REG： 寄存器写入源 1:数据存储器  0 : ALUout
+        REGWR: 是否写入寄存器
+        JRETURN:是否为返回指令
+    数据：
+        next_pc
+        busA
+        busB
+        imm16
+        rt   寄存器编号
+        rd
+}
+
+Ex模块：
+子模块：{
+    扩展器：控制---EXOP
+    ALU
+}
+
+MeM
+
