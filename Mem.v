@@ -18,7 +18,7 @@ module Mem(
     input [31:0]reg_data,
     // mem 
  
-    output [31:0]rdaddr, //读取地址
+    output reg [31:0]rdaddr, //读取地址
     output reg wme,//写内存使能
     output reg [31:0]maddr,//写地址
     output reg [31:0]wdata, //写数据
@@ -27,7 +27,7 @@ module Mem(
     output reg MEM2REG_M,
     output reg REGWR_M,
     output reg [4:0]reg2wr,
-    output reg aluout,
+    output reg [31:0]aluout,
 
     output reg JUMPEN,
     output reg [31:0]jump_pc
@@ -42,7 +42,7 @@ always @(posedge clk) begin
     end
     else begin
         wme<=0;
-        raddr<=ALUout;
+        rdaddr<=ALUout;
     end
     //分支指令的控制
      /*input BRANCH_Ex,

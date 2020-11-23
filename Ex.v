@@ -1,5 +1,6 @@
 module Ex(
     //from id controller
+	 input clk,
     input EXOP,
     input ALUSRC,
     input [3:0]ALUOP,
@@ -37,7 +38,7 @@ module Ex(
     output reg [31:0]reg_data  //寄存器内容传递
 );
 // ext__imm
-reg [31:0]ext_imm;
+wire [31:0]ext_imm;
 ext_sign ext(
     .EXOP(EXOP),
     .imm(imm),
@@ -51,6 +52,17 @@ assign t_addr={ext_imm[31:2],2'b00}+next_pc_id;
 reg [31:0]inA;
 reg [31:0]inB;
 
+always @(*) begin
+	if(ALUSRC==1)begin
+        inA=bushA;
+        inB=ext_imm;
+    end
+    else begin
+        inA=bushA;
+        inB=bushB;
+    end
+
+end
 always @(posedge clk) begin
     tran_addr<=t_addr;
     overflow<=ov;
@@ -58,14 +70,6 @@ always @(posedge clk) begin
     zero<=z;
     reg_data<=bushB;
     //alu input 
-    if(ALUSRC==1)begin
-        inA<=bushA;
-        inB<=ext_imm;
-    end
-    else begin
-        inA<=bushA;
-        inB<=bushB;
-    end
     // chose the reg to write 
     if(REGDST==1) regwr<=rd;
     else regwr<=rt;
@@ -81,8 +85,8 @@ always @(posedge clk) begin
 end
 //ALU out
 wire [31:0] aluout;
-output z;
-output ov;
+wire z;
+wire ov;
 alu alu_cal(
   .ALUOP(ALUOP),
   .inA(inA),

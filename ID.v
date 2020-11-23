@@ -44,7 +44,7 @@ assign op=instr[31:26];
 assign rsreg=instr[25:21];
 assign rtreg=instr[20:16];
 assign rdreg=instr[15:11];
-assign func=[5:0];
+assign func=instr[5:0];
 assign imm_16=instr[15:0];
 /*  EXOP : 扩展器操作  1:符号扩展  0:零扩展
         ALUSRC: ALU B口来源 1:扩展器  0: busB
@@ -61,39 +61,42 @@ assign imm_16=instr[15:0];
         JCALL jal 跳转
         */
 always @(posedge clk) begin
-    next_pc_id<=next_pc_id;
+    next_pc_id<=next_pc;
     rd<=rdreg;
     imm<=imm_16;
-    bushA<=rtdata;
-    bushB<=rsdata;
+    bushA<=rsdata;
+    bushB<=rtdata;
     if(op==6'b000000) begin  //R指令
         rt<=rtreg;
         MEMWR<=0;
         BRANCH<=0;
         BRANCHNE<=0;
         MEM2REG<=0;
-        REGWR<=1;
         JUMP<=0;
         JCALL<=0;
-        if(func==6'b001011) begin    //jr指令
+		  if(func==0)  REGWR<=0;
+        else if(func==6'b001011) begin    //jr指令
             JRETURN<=1;
+				 REGWR<=1;
         end
         else if(func[4]==1) begin                 //无符号指令
-            EXOP<=x;
+            EXOP<=1'bx;
             ALUSRC<=0;
-            ALUOP<={1,func[2:0]};
+            ALUOP<={1'b1,func[2:0]};
             REGDST<=1;
+				 REGWR<=1;
         end
         else begin
-            EXOP<=x;
+            EXOP<=1'bx;
             ALUSRC<=0;
             ALUOP<=func[3:0];
             REGDST<=1;
+				 REGWR<=1;
         end
     end
-    else begin  //j and r type 
+    else begin  //j and i type 
         JRETURN<=0;
-        if(op[5]==1'b1) begin  // i type
+        if(op[5]==1'b0) begin  // i type
 
             rt<=rtreg;
 
@@ -103,7 +106,7 @@ always @(posedge clk) begin
             if(op[4]==1'b1)    // zero extend
                 EXOP<=0;
             else EXOP<=1;
-            case(func)
+            case(op)
             6'b001110: begin        //lw 
                 ALUOP<=4'b1001;   //calculate the mem
                 REGDST<=0;
@@ -114,34 +117,34 @@ always @(posedge clk) begin
                 REGWR<=1;
             end
             6'b001111: begin    //sw
-                REGDST<=x;
+                REGDST<=1'bx;
                 ALUOP<=4'b1001;
                 BRANCH<=0;
                 BRANCHNE<=0;
                 MEMWR<=1;
-                MEM2REG<=x;
+                MEM2REG<=1'bx;
                 REGWR<=0;
             end
             6'b001000: begin    //beq
-                REGDST<=x;
+                REGDST<=1'bx;
                 ALUOP<=4'b1010;
                 BRANCH<=1;
                 BRANCHNE<=0;
                 MEMWR<=0;
-                MEM2REG<=x;
+                MEM2REG<=1'bx;
                 REGWR<=0;
             end
             6'b001001: begin   //bne
-                REGDST<=x;
+                REGDST<=1'bx;
                 ALUOP<=4'b1010;
                 BRANCH<=0;
                 BRANCHNE<=1;
                 MEMWR<=0;
-                MEM2REG<=x;
+                MEM2REG<=1'bx;
                 REGWR<=0;
             end
             default:begin     //i type 运算逻辑指令
-                if(op[4]==1'b1) ALUOP<={1,op[2:0]};
+                if(op[4]==1'b1) ALUOP<={1'b1,op[2:0]};
                 else ALUOP<=op[3:0];
                 REGDST<=0;
                 BRANCH<=0;
@@ -154,7 +157,6 @@ always @(posedge clk) begin
         end
         else begin            
             rt<=5'b11111;    // $31($ra) 寄存器   
-            //j type  这里可能需要重新配置一下控制码
             if(op==6'b100000)begin   //j 
                 JUMP<=1;
                 JCALL<=0;

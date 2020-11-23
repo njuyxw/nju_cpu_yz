@@ -4,13 +4,14 @@ module instr_mem(
     output [31:0]instr
 );
     wire[9:0] paddr;
-    assign paddr=addr[9:0];
+    assign paddr=addr[11:2];
 
     reg [31:0]instr_memory[1023:0];
 
     initial begin
-        $readmemh("",instr_memory);
+        $readmemh("system.mips",instr_memory);
     end
     assign instr=instr_memory[paddr];
+	 
 
 endmodule

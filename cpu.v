@@ -5,10 +5,11 @@
 module cpu(
     input clk,
     input [31:0]memdata,  //数据线
-    output reg[31:0]rdaddr, //读地址线
-    output reg[31:0]maddr, //写地址线
-    output reg[31:0]wdata,  //写数据
-    output reg wme
+    output [31:0]rdaddr, //读地址线
+    output [31:0]maddr, //写地址线
+    output [31:0]wdata,  //写数据
+    output  wme,
+	 output reg [31:0]data
 );
 
 wire JUMPEN;
@@ -24,8 +25,13 @@ IF IFmd(
     .instr(instr)
 );
 
+always @(posedge clk)
+	data<=aluout;
+/*
+
+*/
 wire regwe;
-wire rw;
+wire [4:0]rw;
 wire [31:0]regdin;
 
 wire EXOP;
@@ -38,7 +44,7 @@ wire BRANCHNE;
 wire JRETURN;
 wire JUMP;
 wire JCALL;
-wire MEM2REG,;
+wire MEM2REG;
 wire REGWR;
 
 wire [31:0]busA;
@@ -92,12 +98,13 @@ wire [31:0]reg_data;
 
 Ex Exmd(
     //from id controller
+	 .clk(clk),
     .EXOP(EXOP),
     .ALUSRC(ALUSRC),
     .ALUOP(ALUOP),
     .REGDST(REGDST),
     .MEMWR(MEMWR),
-    .BRANCH(BRANCHNE),
+    .BRANCH(BRANCH),
     .BRANCHNE(BRANCHNE),
     .JRETURN(JRETURN),
     .JUMP(JUMP),
@@ -132,9 +139,10 @@ Ex Exmd(
 wire MEM2REG_M;
 wire REGWR_M;
 wire [4:0]reg2wr;
-wire aluout;
+wire [31:0]aluout;
 
 Mem Memmd(
+	 .clk(clk),
     .MEMWR_Ex(MEMWR_Ex),
     .BRANCH_Ex(BRANCH_Ex),
     .BRANCHNE_Ex(BRANCHNE_Ex),
