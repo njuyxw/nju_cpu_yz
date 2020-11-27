@@ -1,0 +1,10 @@
+Info (10281): Verilog HDL Declaration information at cpu.v(50): object "REGWR" differs only in case from object "regwr" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpu.v Line: 50
+Info (10281): Verilog HDL Declaration information at cpu.v(107): object "ALUout" differs only in case from object "aluout" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpu.v Line: 107
+Info (10281): Verilog HDL Declaration information at cpt_sys.v(25): object "HEX1" differs only in case from object "hex1" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpt_sys.v Line: 25
+Info (10281): Verilog HDL Declaration information at cpt_sys.v(26): object "HEX2" differs only in case from object "hex2" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpt_sys.v Line: 26
+Info (10281): Verilog HDL Declaration information at cpt_sys.v(27): object "HEX3" differs only in case from object "hex3" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpt_sys.v Line: 27
+Info (10281): Verilog HDL Declaration information at cpt_sys.v(28): object "HEX4" differs only in case from object "hex4" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpt_sys.v Line: 28
+Info (10281): Verilog HDL Declaration information at cpt_sys.v(29): object "HEX5" differs only in case from object "hex5" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/cpt_sys.v Line: 29
+Info (10281): Verilog HDL Declaration information at Ex.v(15): object "REGWR" differs only in case from object "regwr" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/Ex.v Line: 15
+Info (10281): Verilog HDL Declaration information at Ex.v(36): object "ALUout" differs only in case from object "aluout" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/Ex.v Line: 36
+Info (10281): Verilog HDL Declaration information at Mem.v(15): object "ALUout" differs only in case from object "aluout" in the same scope File: C:/Users/yxw/Desktop/cpu_v3/Mem.v Line: 15

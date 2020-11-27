@@ -1,0 +1,48 @@
+addi $6,$6,5
+nop
+nop
+nop
+nop
+addi $1,$5,1
+nop
+nop
+nop
+nop
+addi $2,$5,1
+nop
+nop
+nop
+nop
+addi $3,$5,1
+nop
+nop
+nop
+nop
+addi $3,$3,1
+nop
+nop
+nop
+nop
+add $4,$1,$2
+nop
+nop
+nop
+nop
+addi $1,$2,0
+nop
+nop
+nop
+nop
+addi $2,$4,0
+nop
+nop
+nop
+nop
+bne $3,$6,65514
+nop
+nop
+nop
+nop
+nop
+nop
+

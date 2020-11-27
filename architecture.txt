@@ -47,7 +47,7 @@ ori     00100
 xori    00101
 lw      01110                   rt <- memory[rs + (sign-extend)immediate]         lw $1,$2(10)
 sw      01111                   memory[rs + (sign-extend)immediate] <- rt         sw $1,$2(10)
-beq     01000                   if (rs == rt) PC <- PC+1 + (sign-extend)immediate
+beq     01000                   if (rs == rt) PC <- PC+4 + (sign-extend)immediate
 bne     01001                   if (rs != rt) PC <- PC+1 + (sign-extend)immediate   
 slti    00111                   if (rs <(sign-extend)immediate) rt=1 else rt=0 
 sltiu   10111                   if (rs <(zero-extend)immediate) rt=1 else rt=0
@@ -72,8 +72,8 @@ J类型:op高位为1
 ---------------------------------
 |op:6 |        addr:16
 ---------------------------------
-j      100000               PC <- PC+1+addr
-jal    100001               $ra<-PC+1；PC <- PC+1+addr
+j      100000               PC <- PC+4+addr
+jal    100001               $ra<-PC+4；PC <- PC+4+addr
 
 
 五级流水线：
